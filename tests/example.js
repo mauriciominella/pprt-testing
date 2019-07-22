@@ -6,12 +6,14 @@ const click = require('../lib/helpers').click
 const typeText = require('../lib/helpers').typeText
 const loadUrl = require('../lib/helpers').loadUrl
 const waitForText = require('../lib/helpers').waitForText
+const shouldExist = require('../lib/helpers').shouldExist
+const pressKey = require('../lib/helpers').pressKey
 
 describe('My first puppeteer test', () => {
   let browser
   let page
 
-  before(async function() {
+  before(async function () {
     browser = await puppeteer.launch({
       headless: config.isHeadless,
       slowMo: config.slowMo,
@@ -26,13 +28,13 @@ describe('My first puppeteer test', () => {
     })
   })
 
-  after(async function() {
+  after(async function () {
     await browser.close();
   })
 
   it('My first test step', async () => {
     await loadUrl(page, config.baseUrl)
-    await page.waitForSelector('#nav-search')
+    await shouldExist(page, '#nav-search')
 
     const url = await page.url()
     const title = await page.title()
@@ -43,7 +45,7 @@ describe('My first puppeteer test', () => {
 
   it('browser reload', async () => {
     await page.reload()
-    await page.waitForSelector('#page-content')
+    await shouldExist(page, '#page-content')
 
     await waitForText(page, 'body', 'WRITE A POST')
 
@@ -58,14 +60,13 @@ describe('My first puppeteer test', () => {
     await loadUrl(page, config.baseUrl)
     await click(page, '#write-link')
 
-    await page.waitForSelector('.registration-rainbow')
+    await shouldExist(page, '.registration-rainbow')
   })
 
   it('submit searchbox', async () => {
     await loadUrl(page, config.baseUrl)
-    await page.waitForSelector('#nav-search')
     await typeText(page, 'Javascript', '#nav-search')
-    await page.keyboard.press('Enter')
-    await page.waitForSelector('#articles-list')
+    await pressKey(page, 'Enter')
+    await shouldExist(page, '#articles-list')
   })
 })
